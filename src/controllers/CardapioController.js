@@ -15,6 +15,23 @@ const CardapioController =  {
         }
     },
     
+    async findByPk(req, res) {
+        try {
+            const { id } = req.params;
+            
+            const cardapio = await Cardapio.findByPk(id, {});
+
+            if (!cardapio) {
+                return res.status(404).json({ error: 'Item não encontrado.' });
+            }
+
+            return res.status(200).json(cardapio);
+        } catch (error) {
+            console.error('Erro ao buscar Item:', error);
+            return res.status(500).json({ error: 'Erro interno do servidor.' });
+        }
+    },
+
     async create(req, res) {
         try {
             const { nome, descricao, preco, tipo, imagem } = req.body;

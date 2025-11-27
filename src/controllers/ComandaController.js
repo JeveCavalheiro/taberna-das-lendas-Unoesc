@@ -4,6 +4,17 @@ const { Comanda, ItemComanda, Cardapio, OrdemProducao } = db;
 
 const ComandaController = {
 
+    // LISTAR Comanda (GET /api/comandas/)
+    async listarComandas(req, res) {
+        try {
+            const comandas = await Comanda.findAll({});
+            return res.status(200).json(comandas);
+        } catch (error) {
+            console.error('Erro ao buscar comandas:', error);
+            return res.status(500).json({ error: 'Erro interno do servidor.' });
+        }
+    },
+
     // CRIAR Comanda (POST /api/comandas/)
     async abrirComanda(req, res) {
          try {
@@ -120,7 +131,7 @@ const ComandaController = {
         const itemComandaId = req.params.id
         const ordemProducao = await OrdemProducao.findOne({ 
             where: { 
-                itemComandaId: itemComandaId, 
+                id: itemComandaId, 
                 status: 'pronto' 
             } 
         });
@@ -181,7 +192,30 @@ const ComandaController = {
             console.error('Erro ao deletar item:', error);
             return res.status(500).json({ error: 'Erro interno do servidor.' });
         }
+    },
+
+    async listarItens(req, res) {
+    try {
+        const comandaId = req.params.comandaId;
+
+        const itens = await db.ItemComanda.findAll({
+            where: { comandaId },
+            include: [
+                {
+                    model: db.Cardapio,
+                    attributes: ["nome", "preco", "tipo"]
+                }
+            ]
+        });
+
+        return res.status(200).json(itens);
+
+    } catch (error) {
+        console.error("Erro ao listar itens:", error);
+        return res.status(500).json({ error: "Erro ao buscar itens." });
     }
+}
+
 };
 
 module.exports = ComandaController;

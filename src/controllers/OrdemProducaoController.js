@@ -1,17 +1,39 @@
 const db = require('../models');
-const { OrdemProducao } = db;
+const OrdemProducao = db.OrdemProducao;
 
 const OrdemProducaoController = {
 
-    // ATUALIZAR Item (POST /api/ordem/:id/entregar)
-    async atualizarItemCozinha(req, res) {
+    async findAllCozinha(req, res) {
+        try {
+            const ordens = await OrdemProducao.findAll({
+                where: { setorId: 1 }
+            });
+
+            return res.status(200).json(ordens);
+
+        } catch (error) {
+            console.error('Erro ao buscar OrdemProducao:', error);
+            return res.status(500).json({ error: 'Erro interno do servidor.' });
+        }
+    },
+
+    async findAllCopa(req, res) {
+        try {
+            const ordens = await OrdemProducao.findAll({
+                where: { setorId: 2 }
+            });
+
+            return res.status(200).json(ordens);
+
+        } catch (error) {
+            console.error('Erro ao buscar OrdemProducao:', error);
+            return res.status(500).json({ error: 'Erro interno do servidor.' });
+        }
+    },
+
+    async atualizarItem(req, res) {
         try {
             const ordemId = req.params.id;
-            const { novoStatus } = req.body; 
-            const statusValidos = ['preparando', 'pronto'];
-            if (!statusValidos.includes(novoStatus)) {
-                return res.status(400).json({ error: 'Status inválido. Use "preparando" ou "pronto".' });
-            }
 
             const ordemProducao = await OrdemProducao.findByPk(ordemId);
 
@@ -19,11 +41,8 @@ const OrdemProducaoController = {
                 return res.status(404).json({ error: 'Ordem de Produção não encontrada.' });
             }
 
-            await ordemProducao.update({ status: novoStatus });
+            await ordemProducao.update({ status: 'pronto' });
 
-            if (novoStatus === 'pronto') {
-                
-            }
             return res.status(200).json(ordemProducao);
 
         } catch (error) {
@@ -33,4 +52,4 @@ const OrdemProducaoController = {
     }
 }
 
-module.exports = OrdemProducaoController
+module.exports = OrdemProducaoController;
